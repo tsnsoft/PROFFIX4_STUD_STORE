@@ -141,6 +141,8 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:onClick="switchClick"
         android:text="@string/switch_text"
         android:textSize="16sp"

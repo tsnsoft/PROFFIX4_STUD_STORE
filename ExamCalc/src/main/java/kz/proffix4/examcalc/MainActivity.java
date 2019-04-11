@@ -1,9 +1,11 @@
 package kz.proffix4.examcalc;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -24,28 +26,36 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setTitle("Калькулятор баллов");
+        setTitle("Калькулятор баллов ПГУ");
 
         // Доступ к компонентам окна
-        editText_num1 = (EditText)findViewById(R.id.editText_num1);
-        editText_num2 = (EditText)findViewById(R.id.editText_num2);
-        resultText = (TextView)findViewById(R.id.result);
-        errorText = (TextView)findViewById(R.id.error);
-        letterText = (TextView)findViewById(R.id.letterResult);
+        editText_num1 = (EditText) findViewById(R.id.editText_num1);
+        editText_num2 = (EditText) findViewById(R.id.editText_num2);
+        resultText = (TextView) findViewById(R.id.result);
+        errorText = (TextView) findViewById(R.id.error);
+        letterText = (TextView) findViewById(R.id.letterResult);
         button1 = (Button) findViewById(R.id.button1);
         switch1 = (Switch) findViewById(R.id.switch1);
-        textView = (TextView)findViewById(R.id.textView2);
+        textView = (TextView) findViewById(R.id.textView2);
 
 
         View.OnKeyListener myKeyListener = new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 // Проверка условия: если пусто в "a" или "b"
+                clearText();
                 if (editText_num1.getText().toString().trim().equals("") ||
                         editText_num2.getText().toString().trim().equals("")) {
                     button1.setEnabled(false); // Выключаем доступность нажатия у кнопки
                 } else {
                     button1.setEnabled(true); // Включаем доступность нажатия у кнопки
+                }
+
+                // Если нажата клавиша Enter
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && ((keyCode == KeyEvent.KEYCODE_ENTER))
+                        && ((keyCode == KeyEvent.KEYCODE_DEL))) {
+                    // Скрываем клавиатуру
+                    hideSoftInput();
                 }
                 return false;
             }
@@ -57,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void switchClick (View v) {
+    public void switchClick(View v) {
         if (switch1.isChecked()) {
             textView.setText("Итоговая");
         } else {
@@ -65,27 +75,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onButtonClick (View v) {                       //Расчет итоговой оценки
-        clearText ();
+    public void onButtonClick(View v) {                       //Расчет итоговой оценки
+        clearText();
         if (switch1.isChecked()) {
             double a, b, result;
 
             try {
                 a = Double.parseDouble(editText_num1.getText().toString().trim());
                 b = Double.parseDouble(editText_num2.getText().toString().trim());
-                clearText ();
+                clearText();
                 if ((a < 50 || a > 100) && (b < 50 || b > 100)) {
                     errorText.setText(String.format("Введены неверные баллы"));
                 } else if (a < 50 || a > 100) {
                     errorText.setText(String.format("Неверный рейтинг допуска"));
                 } else if (b < 50 || b > 100) {
                     errorText.setText(String.format("Неверная итоговая оценка"));
-                } else if (Math.round(a*0.6) < (b - 40)) {
+                } else if (Math.round(a * 0.6) < (b - 40)) {
                     errorText.setText(String.format("Слишком низкий РД для желаемой оценки"));
-                }else {
-                    result = Math.floor((b - (a * 0.6))/0.4);
+                } else {
+                    result = Math.floor((b - (a * 0.6)) / 0.4);
                     if (result >= 50) {
-                        for (int i=0; i <=5; i++) {
+                        for (int i = 0; i <= 5; i++) {
                             if (b == Math.round((a * 0.6) + ((result - 1) * 0.4))) {
                                 result = result - 1;
                             }
@@ -104,14 +114,14 @@ public class MainActivity extends AppCompatActivity {
             try {
                 a = Double.parseDouble(editText_num1.getText().toString().trim());
                 b = Double.parseDouble(editText_num2.getText().toString().trim());
-                clearText ();
+                clearText();
                 if ((a < 50 || a > 100) && (b < 50 || b > 100)) {
                     errorText.setText(String.format("Введены неверные баллы"));
                 } else if (a < 50 || a > 100) {
                     errorText.setText(String.format("Неверный рейтинг допуска"));
                 } else if (b < 50 || b > 100) {
                     errorText.setText(String.format("Неверная экзаменнационная оценка"));
-                }  else {
+                } else {
                     result = Math.round((a * 0.6) + (b * 0.4));
                     resultText.append("Итоговый балл: " + (String.format("%.0f", result)));
                     letterResult(result);
@@ -123,10 +133,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void letterResult (Double result) {
+    public void letterResult(Double result) {
         if (result >= 95) {
             setLetterText("A", "4.0", "Отлично");
-        } else if ( result >= 90) {
+        } else if (result >= 90) {
             setLetterText("A-", "3.67", "Отлично");
         } else if (result >= 85) {
             setLetterText("B+", "3.33", "Хорошо");
@@ -151,15 +161,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void clearText () { // Очистка полей с текстом
+    public void clearText() { // Очистка полей с текстом
         resultText.setText("");
         errorText.setText("");
         letterText.setText("");
     }
 
-    public void setLetterText (String a, String b, String c) { // Заполнитель результата
+    public void setLetterText(String a, String b, String c) { // Заполнитель результата
         letterText.setText("Буквенная система: " + a + "\n\n");
         letterText.append("Цифровой эквивалент: " + b + "\n\n");
         letterText.append("Традиционная система: " + c);
     }
+
+    // Скрываем клавиатуру
+    private void hideSoftInput() {
+        try {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        } catch (Exception e) {
+        }
+    }
+
+
 }
