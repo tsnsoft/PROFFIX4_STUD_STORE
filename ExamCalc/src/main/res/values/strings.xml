@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">PSU Exams</string>
+    <string name="button1_text">Посчитать</string>
+    <string name="num1_text">Рейтинг допуска</string>
+    <string name="num2_text">Экзамен</string>
+    <string name="number_hint">50-100</string>
+    <string name="switch_text">Обратный расчет</string>
+</resources>
