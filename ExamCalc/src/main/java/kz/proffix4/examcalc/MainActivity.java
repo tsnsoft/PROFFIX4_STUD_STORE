@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setTitle("Калькулятор баллов ПГУ");
+        setTitle("Калькулятор баллов");
 
         // Доступ к компонентам окна
         editText_num1 = (EditText) findViewById(R.id.editText_num1);
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 // Проверка условия: если пусто в "a" или "b"
-                clearText();
+                clearResult();
                 if (editText_num1.getText().toString().trim().equals("") ||
                         editText_num2.getText().toString().trim().equals("")) {
                     button1.setEnabled(false); // Выключаем доступность нажатия у кнопки
@@ -52,8 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 // Если нажата клавиша Enter
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) && ((keyCode == KeyEvent.KEYCODE_ENTER))
-                        && ((keyCode == KeyEvent.KEYCODE_DEL))) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     // Скрываем клавиатуру
                     hideSoftInput();
                 }
@@ -76,14 +75,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onButtonClick(View v) {                       //Расчет итоговой оценки
-        clearText();
+        clearResult();
         if (switch1.isChecked()) {
             double a, b, result;
 
             try {
                 a = Double.parseDouble(editText_num1.getText().toString().trim());
                 b = Double.parseDouble(editText_num2.getText().toString().trim());
-                clearText();
+                clearResult();
                 if ((a < 50 || a > 100) && (b < 50 || b > 100)) {
                     errorText.setText(String.format("Введены неверные баллы"));
                 } else if (a < 50 || a > 100) {
@@ -114,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 a = Double.parseDouble(editText_num1.getText().toString().trim());
                 b = Double.parseDouble(editText_num2.getText().toString().trim());
-                clearText();
+                clearResult();
                 if ((a < 50 || a > 100) && (b < 50 || b > 100)) {
                     errorText.setText(String.format("Введены неверные баллы"));
                 } else if (a < 50 || a > 100) {
@@ -161,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void clearText() { // Очистка полей с текстом
+    public void clearResult() { // Очистка полей с текстом
         resultText.setText("");
         errorText.setText("");
         letterText.setText("");
