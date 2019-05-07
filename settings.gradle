@@ -1,1 +1,1 @@
-include 'ExamCalc'
+include 'ExamCalc', 'PSUNews'

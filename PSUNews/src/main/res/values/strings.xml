@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Новости ПГУ</string>
+    <string name="action_settings">Настройки</string>
+    <string name="action_update">Обновить</string>
+    <string name="title_activity_news">NewsActivity</string>
+    <string name="pref_size">Размер</string>
+    <string name="language">Язык</string>
+
+</resources>
