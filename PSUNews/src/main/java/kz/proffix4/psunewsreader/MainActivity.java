@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<HashMap<String, String>> list;
 
     float fSize;
+    private int poslistView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         listView = findViewById(R.id.listView);
+
+        listView.smoothScrollToPosition(4);
 
         swipeRefreshLayout = findViewById(R.id.swiperefresh);
 
@@ -56,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
+                poslistView = pos;
+                System.out.println(pos);
                 Intent intent = new Intent(MainActivity.this, NewsActivity.class);
                 HashMap<String, String> result = list.get(pos);
                 intent.putExtra("newsURL", result.get("readmore"));
@@ -160,6 +165,9 @@ public class MainActivity extends AppCompatActivity {
         if (listView != null & adapter != null) {
             adapter = new CustomListAdapter(getApplicationContext(), list, fSize);
             listView.setAdapter(adapter);
+            if (poslistView != -1) {
+                listView.setSelection(poslistView);
+            }
         }
     }
 }
