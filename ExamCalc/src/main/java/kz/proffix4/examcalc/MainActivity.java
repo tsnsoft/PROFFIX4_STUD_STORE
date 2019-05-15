@@ -13,14 +13,14 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText editText_num1;
-    EditText editText_num2;
+    EditText rating;
+    EditText grade;
     Button button1;
-    TextView resultText;
+    TextView examText;
     TextView errorText;
-    TextView letterText;
+    TextView total;
     TextView textView;
-    Switch switch1;
+    Switch switchRecount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,23 +29,22 @@ public class MainActivity extends AppCompatActivity {
         setTitle("Калькулятор баллов");
 
         // Доступ к компонентам окна
-        editText_num1 = (EditText) findViewById(R.id.editText_num1);
-        editText_num2 = (EditText) findViewById(R.id.editText_num2);
-        resultText = (TextView) findViewById(R.id.result);
+        rating = (EditText) findViewById(R.id.editText_num1);
+        grade = (EditText) findViewById(R.id.editText_num2);
+        examText = (TextView) findViewById(R.id.result);
         errorText = (TextView) findViewById(R.id.error);
-        letterText = (TextView) findViewById(R.id.letterResult);
+        total = (TextView) findViewById(R.id.letterResult);
         button1 = (Button) findViewById(R.id.button1);
-        switch1 = (Switch) findViewById(R.id.switch1);
+        switchRecount = (Switch) findViewById(R.id.switch1);
         textView = (TextView) findViewById(R.id.textView2);
-
 
         View.OnKeyListener myKeyListener = new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                // Проверка условия: если пусто в "a" или "b"
+                // Проверка условия: если пусто в "rating" или "grade"
                 clearResult();
-                if (editText_num1.getText().toString().trim().equals("") ||
-                        editText_num2.getText().toString().trim().equals("")) {
+                if (rating.getText().toString().trim().equals("") ||
+                        grade.getText().toString().trim().equals("")) {
                     button1.setEnabled(false); // Выключаем доступность нажатия у кнопки
                 } else {
                     button1.setEnabled(true); // Включаем доступность нажатия у кнопки
@@ -61,115 +60,116 @@ public class MainActivity extends AppCompatActivity {
         };
 
         button1.setEnabled(false); // Выключаем доступность нажатия у кнопки
-        editText_num1.setOnKeyListener(myKeyListener); // Добавляем к компоненту свой обработчик нажатий
-        editText_num2.setOnKeyListener(myKeyListener);
+        rating.setOnKeyListener(myKeyListener); // Добавляем к компоненту свой обработчик нажатий
+        grade.setOnKeyListener(myKeyListener);
 
     }
 
     public void switchClick(View v) {
-        if (switch1.isChecked()) {
+        clearResult();
+        if (switchRecount.isChecked()) {
             textView.setText("Итоговая");
         } else {
             textView.setText("Экзамен");
         }
     }
 
-    public void onButtonClick(View v) {                       //Расчет итоговой оценки
+    public void onButtonClick(View v) { //Расчет итоговой оценки
+        double rating = Double.parseDouble(this.rating.getText().toString().trim());
+        double grade = Double.parseDouble(this.grade.getText().toString().trim());
+        double result;
         clearResult();
-        if (switch1.isChecked()) {
-            double a, b, result;
-
-            try {
-                a = Double.parseDouble(editText_num1.getText().toString().trim());
-                b = Double.parseDouble(editText_num2.getText().toString().trim());
-                clearResult();
-                if ((a < 50 || a > 100) && (b < 50 || b > 100)) {
-                    errorText.setText(String.format("Введены неверные баллы"));
-                } else if (a < 50 || a > 100) {
+        try {
+            if (switchRecount.isChecked()) {
+                if ((rating < 50 || rating > 100) && (grade < 50 || grade > 100)) {
+                    errorText.setText(String.format("Введены неверные данные"));
+                } else if (rating < 50 || rating > 100) {
                     errorText.setText(String.format("Неверный рейтинг допуска"));
-                } else if (b < 50 || b > 100) {
+                } else if (grade < 50 || grade > 100) {
                     errorText.setText(String.format("Неверная итоговая оценка"));
-                } else if (Math.round(a * 0.6) < (b - 40)) {
+                } else if (Math.round(rating * 0.6) < (grade - 40)) {
                     errorText.setText(String.format("Слишком низкий РД для желаемой оценки"));
                 } else {
-                    result = Math.floor((b - (a * 0.6)) / 0.4);
+                    result = Math.floor((grade - (rating * 0.6)) / 0.4);
                     if (result >= 50) {
                         for (int i = 0; i <= 5; i++) {
-                            if (b == Math.round((a * 0.6) + ((result - 1) * 0.4))) {
+                            if (grade == Math.round((rating * 0.6) + ((result - 1) * 0.4))) {
                                 result = result - 1;
                             }
                         }
-                        resultText.setText("Необходимые баллы за экзамене: " + (String.format("%.0f", result)) + " минимум");
+                        examText.setText("Необходимые баллы за экзамене: " + (String.format("%.0f", result)) + " минимум");
                     } else {
                         errorText.setText(String.format("Слишком высокий РД для желаемой оценки"));
                     }
                 }
-            } catch (Exception ex) {
-                resultText.setText(String.format("Error!"));
-            }
-        } else {
-            double a, b, result;
-
-            try {
-                a = Double.parseDouble(editText_num1.getText().toString().trim());
-                b = Double.parseDouble(editText_num2.getText().toString().trim());
-                clearResult();
-                if ((a < 50 || a > 100) && (b < 50 || b > 100)) {
-                    errorText.setText(String.format("Введены неверные баллы"));
-                } else if (a < 50 || a > 100) {
+            } else {
+                if ((rating < 50 || rating > 100) && (grade < 50 || grade > 100)) {
+                    errorText.setText(String.format("Введены неверные данные"));
+                } else if (rating < 50 || rating > 100) {
                     errorText.setText(String.format("Неверный рейтинг допуска"));
-                } else if (b < 50 || b > 100) {
+                } else if (grade < 50 || grade > 100) {
                     errorText.setText(String.format("Неверная экзаменнационная оценка"));
                 } else {
-                    result = Math.round((a * 0.6) + (b * 0.4));
-                    resultText.append("Итоговый балл: " + (String.format("%.0f", result)));
-                    letterResult(result);
+                    result = Math.round((rating * 0.6) + (grade * 0.4));
+                    examText.append("Сам зкзамен: " + determineGrade(grade, false));
+                    setLetterResult(result);
                 }
-            } catch (Exception ex) {
-                resultText.setText(String.format("Error!"));
             }
+        } catch (Exception ex) {
+            examText.setText(String.format("Ошибка!"));
         }
 
     }
 
-    public void letterResult(Double result) {
-        if (result >= 95) {
-            setLetterText("A", "4.0", "Отлично");
-        } else if (result >= 90) {
-            setLetterText("A-", "3.67", "Отлично");
-        } else if (result >= 85) {
-            setLetterText("B+", "3.33", "Хорошо");
-        } else if (result >= 80) {
-            setLetterText("B", "3.0", "Хорошо");
-        } else if (result >= 75) {
-            setLetterText("B-", "2.67", "Хорошо");
-        } else if (result >= 70) {
-            setLetterText("C+", "2.33", "Хорошо");
-        } else if (result >= 65) {
-            setLetterText("C", "2.0", "Удовл.");
-        } else if (result >= 60) {
-            setLetterText("C-", "1,67", "Удовл.");
-        } else if (result >= 55) {
-            setLetterText("D+", "1.33", "Удовл.");
-        } else if (result >= 50) {
-            setLetterText("D-", "1.0", "Удовл.");
-        } else if (result >= 25) {
-            setLetterText("FX", "0.5", "Неудовл.");
+    public void setLetterResult(Double result) {
+        total.setText("   ➳ ИТОГ ЭКЗАМЕНА: ");
+        total.append(determineGrade(result, true));
+    }
+
+    // Определитель оценки из процента
+    public String determineGrade(Double percent, boolean newLines) {
+        if (percent >= 95) {
+            return getLetterGrade(percent, "A", "4.0", "Отлично", newLines);
+        } else if (percent >= 90) {
+            return getLetterGrade(percent, "A-", "3.67", "Отлично", newLines);
+        } else if (percent >= 85) {
+            return getLetterGrade(percent, "B+", "3.33", "Хорошо", newLines);
+        } else if (percent >= 80) {
+            return getLetterGrade(percent, "B", "3.0", "Хорошо", newLines);
+        } else if (percent >= 75) {
+            return getLetterGrade(percent, "B-", "2.67", "Хорошо", newLines);
+        } else if (percent >= 70) {
+            return getLetterGrade(percent, "C+", "2.33", "Хорошо", newLines);
+        } else if (percent >= 65) {
+            return getLetterGrade(percent, "C", "2.0", "Удовл.", newLines);
+        } else if (percent >= 60) {
+            return getLetterGrade(percent, "C-", "1,67", "Удовл.", newLines);
+        } else if (percent >= 55) {
+            return getLetterGrade(percent, "D+", "1.33", "Удовл.", newLines);
+        } else if (percent >= 50) {
+            return getLetterGrade(percent, "D-", "1.0", "Удовл.", newLines);
+        } else if (percent >= 25) {
+            return getLetterGrade(percent, "FX", "0.5", "Неудовл.", newLines);
         } else {
-            setLetterText("F", "0", "Неудовл.");
+            return getLetterGrade(percent, "F", "0", "Неудовл.", newLines);
+        }
+    }
+
+    public String getLetterGrade(Double percent, String letter, String digital, String traditional, boolean fullFormat) { // Заполнитель результата
+        if (fullFormat) {
+            return (String.format("%.0f", percent) + "\n\n") +
+                    "Буквенная система: " + letter + "\n\n" +
+                    "Цифровой эквивалент: " + digital + "\n\n" +
+                    "Традиционная система: " + traditional;
+        } else {
+            return letter + ", " + digital + " (" + traditional + ")";
         }
     }
 
     public void clearResult() { // Очистка полей с текстом
-        resultText.setText("");
+        examText.setText("");
         errorText.setText("");
-        letterText.setText("");
-    }
-
-    public void setLetterText(String a, String b, String c) { // Заполнитель результата
-        letterText.setText("Буквенная система: " + a + "\n\n");
-        letterText.append("Цифровой эквивалент: " + b + "\n\n");
-        letterText.append("Традиционная система: " + c);
+        total.setText("");
     }
 
     // Скрываем клавиатуру
@@ -180,6 +180,5 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
         }
     }
-
 
 }
