@@ -60,10 +60,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
                 poslistView = pos;
-                System.out.println(pos);
+
                 Intent intent = new Intent(MainActivity.this, NewsActivity.class);
                 HashMap<String, String> result = list.get(pos);
+
                 intent.putExtra("newsURL", result.get("readmore"));
+                intent.putExtra("title", result.get("title"));
+
                 startActivity(intent);
             }
         });

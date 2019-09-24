@@ -26,6 +26,7 @@ public class NewsActivity extends AppCompatActivity {
     private String URL;
 
     private TextView titleTextView, desc1TextView, desc2TextView;
+    private String title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +46,8 @@ public class NewsActivity extends AppCompatActivity {
         });
 
         URL = getIntent().getStringExtra("newsURL");
+        title = getIntent().getStringExtra("title");
+
         titleTextView = findViewById(R.id.title);
         desc1TextView = findViewById(R.id.desc1);
         desc2TextView = findViewById(R.id.desc2);
@@ -62,8 +65,16 @@ public class NewsActivity extends AppCompatActivity {
             try {
                 Document doc = Jsoup.connect(URL).get();
                 Elements container = doc.select("div.post-inner");
-                Element title = container.select("h2.postheader").first();
-                titleText = title.text();
+
+                try {
+                    Element title = container.select("h2.postheader").first();
+                    titleText = title.text();
+                } catch (Exception e) {
+                    if (title != null) titleText = title;
+                    else titleText = "";
+                }
+
+
                 Elements content = container.select("div.postcontent div.article");
                 Elements desc = content.select("p[style]");
                 Element header = desc.first();

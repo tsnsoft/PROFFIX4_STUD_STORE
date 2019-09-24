@@ -9,6 +9,7 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.GridItemViewHolder> {
@@ -45,7 +46,13 @@ public class ImageGridAdapter extends RecyclerView.Adapter<ImageGridAdapter.Grid
 
     @Override
     public int getItemCount() {
-        return imageList.size();
+        try {
+            return imageList.size();
+        }
+        catch (Exception e) {
+            return 0;
+        }
+
     }
 
 }
