@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                                 result = result - 1;
                             }
                         }
-                        examText.setText("Необходимые баллы за экзамене: " + (String.format("%.0f", result)) + " минимум");
+                        examText.setText("Необходимые баллы на экзамене: " + (String.format("%.0f", result)) + " минимум");
                     } else {
                         errorText.setText(String.format("Слишком высокий РД для желаемой оценки"));
                     }
