@@ -75,11 +75,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onButtonClick(View v) { //Расчет итоговой оценки
-        double rating = Double.parseDouble(this.rating.getText().toString().trim());
-        double grade = Double.parseDouble(this.grade.getText().toString().trim());
-        double result;
-        clearResult();
         try {
+            double rating = Double.parseDouble(this.rating.getText().toString().trim());
+            double grade = Double.parseDouble(this.grade.getText().toString().trim());
+            double result;
+            clearResult();
             if (switchRecount.isChecked()) {
                 if ((rating < 50 || rating > 100) && (grade < 50 || grade > 100)) {
                     errorText.setText(String.format("Введены неверные данные"));
