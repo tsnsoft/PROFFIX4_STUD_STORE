@@ -6,9 +6,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,23 +13,26 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
+    public ArrayList<HashMap<String, String>> list;
+    CustomListAdapter adapter;
+    float fSize;
     private ListView listView;
     private SwipeRefreshLayout swipeRefreshLayout;
-    CustomListAdapter adapter;
-
-    public ArrayList<HashMap<String, String>> list;
-
-    float fSize;
     private int poslistView;
 
     @Override
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                new NewThread().execute();
+                new NewThread(MainActivity.this).execute();
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -71,68 +71,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        new NewThread().execute();
-    }
-
-    public class NewThread extends AsyncTask<String, Void, String> {
-
-        ProgressDialog dialog;
-
-        @Override
-        protected String doInBackground(String... arg) {
-            try {
-                list = new ArrayList<>();
-                String URL = "http://psu.kz/index.php?lang=rus";
-                Document doc = Jsoup.connect(URL).get();
-                Elements containers = doc.select("div.moduletable");
-                Element container = containers.get(0);
-                Elements news = container.select("div.slide");
-                for (Element row : news.select("div.bt-row")) {
-                    HashMap<String, String> map = new HashMap<String, String>();
-                    Elements inner = row.select("div.bt-inner");
-                    Elements title = inner.select("a.bt-title");
-                    map.put("title", title.text());
-                    Elements descs = row.select("div.bt-introtext");
-                    Element desc = descs.get(0);
-                    map.put("desc", desc.text());
-                    Elements images = row.select("div.bt-center a.bt-image-link img");
-                    String imgSrcUrl = images.attr("abs:src");
-                    map.put("image", imgSrcUrl);
-                    Element readmore = row.select("p.readmore a").first();
-                    String link = readmore.attr("abs:href");
-                    map.put("readmore", link);
-                    list.add(map);
-                }
-            } catch (Exception ignored) {
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            dialog = new ProgressDialog(MainActivity.this);
-            dialog.setProgress(0);
-            dialog.setMessage("Обновление..");
-            dialog.setCancelable(false);
-            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            dialog.show();
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-
-            if (dialog.isShowing())
-                dialog.dismiss();
-
-            adapter = new CustomListAdapter(getApplicationContext(), list, fSize);
-            listView.setAdapter(adapter);
-
-            if (list.size() == 0) {
-                Toast.makeText(getApplicationContext(), "Нет данных", Toast.LENGTH_LONG).show();
-            }
-        }
+        new NewThread(MainActivity.this).execute();
     }
 
     @Override
@@ -146,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_update) {
-            new NewThread().execute();
+            new NewThread(MainActivity.this).execute();
             return true;
         }
 
@@ -170,6 +109,85 @@ public class MainActivity extends AppCompatActivity {
             listView.setAdapter(adapter);
             if (poslistView != -1) {
                 listView.setSelection(poslistView);
+            }
+        }
+    }
+
+    private static class NewThread extends AsyncTask<String, Void, String> {
+
+        private static final String URL = "https://tou.edu.kz/ru/component/news";
+
+        private WeakReference<MainActivity> activityWeakReference;
+        MainActivity activity;
+
+        ProgressDialog dialog;
+
+        NewThread(MainActivity context) {
+            activityWeakReference = new WeakReference<>(context);
+            activity = activityWeakReference.get();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            if (activity == null || activity.isFinishing()) {
+                return;
+            }
+
+            dialog = new ProgressDialog(activityWeakReference.get());
+            dialog.setProgress(0);
+            dialog.setMessage("Обновление..");
+            dialog.setCancelable(false);
+            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            dialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... arg) {
+            if (activity == null) {
+                return null;
+            }
+
+            try {
+                activityWeakReference.get().list = new ArrayList<>();
+                Document doc = Jsoup.connect(URL).get();
+                Element container = doc.selectFirst("div.row > div.col.s12 > div.news-list");
+                Elements news = container.select("div.row");
+                for (Element row : news) {
+                    HashMap<String, String> map = new HashMap<>();
+                    Element title = row.selectFirst("div.news-list-title");
+                    map.put("title", title.selectFirst("a").text());
+                    Element desc = row.selectFirst("div.news-list-introtext");
+                    map.put("desc", desc.text());
+                    Element image = row.selectFirst("div.news-list-image").selectFirst("img");
+                    map.put("image", image.attr("abs:src"));
+                    String link = title.selectFirst("a").attr("abs:href");
+                    map.put("readmore", link);
+                    activityWeakReference.get().list.add(map);
+                }
+            } catch (Exception ignored) {
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+
+            if (activity == null || activity.isFinishing()) {
+                return;
+            }
+
+            if (dialog.isShowing())
+                dialog.dismiss();
+
+            activityWeakReference.get().adapter = new CustomListAdapter(activityWeakReference.get(),
+                    activityWeakReference.get().list, activityWeakReference.get().fSize);
+            activityWeakReference.get().listView.setAdapter(activityWeakReference.get().adapter);
+
+            if (activityWeakReference.get().list.size() == 0) {
+                Toast.makeText(activityWeakReference.get(), "Нет данных", Toast.LENGTH_LONG).show();
             }
         }
     }
