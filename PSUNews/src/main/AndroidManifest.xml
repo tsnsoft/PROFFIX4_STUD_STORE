@@ -24,10 +24,10 @@
         <activity
             android:name="kz.proffix4.psunewsreader.NewsActivity"
             android:label="@string/title_activity_news"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/action_settings"></activity>
+            android:label="@string/action_settings" />
     </application>
 
 </manifest>
