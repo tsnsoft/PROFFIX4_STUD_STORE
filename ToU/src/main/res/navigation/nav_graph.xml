@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/home_view_pager_fragment">
+
+    <fragment
+        android:id="@+id/home_view_pager_fragment"
+        android:name="kz.gvsx.tou.HomeViewPagerFragment"
+        tools:layout="@layout/fragment_home_view_pager">
+        <action
+            android:id="@+id/action_home_view_pager_fragment_to_article_fragment"
+            app:destination="@id/article_fragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/article_fragment"
+        android:name="kz.gvsx.tou.ui.article.ArticleFragment"
+        tools:layout="@layout/fragment_article">
+        <argument
+            android:name="articleLink"
+            app:argType="string" />
+        <argument
+            android:name="title"
+            app:argType="string" />
+    </fragment>
+
+</navigation>

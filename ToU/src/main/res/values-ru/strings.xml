@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Торайгыров Университет</string>
+    <string name="tab_news">Новости</string>
+    <string name="tab_notifications">Объявления</string>
+</resources>
